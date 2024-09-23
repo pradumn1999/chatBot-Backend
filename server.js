@@ -21,7 +21,7 @@ const model = genAI.getGenerativeModel({
 });
 
 const corsOptions = {
-  origin: frontendUrl || '*', // Fallback for development
+  origin: frontendUrl || '*', // Fallback for development if FRONTEND_URL is not set
   methods: 'GET,POST',
   allowedHeaders: ['Content-Type'],
 };
@@ -37,7 +37,7 @@ const generationConfig = {
   responseMimeType: "text/plain",
 };
 
-app.post('/generate', async (req, res) => {
+app.post('/api/generate', async (req, res) => {
   const { message } = req.body;
   console.log('Received message:', message); 
 
