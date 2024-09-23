@@ -10,8 +10,14 @@ const model = genAI.getGenerativeModel({
   model: "gemini-1.5-flash",
 });
 
-const cors = require('cors');
-app.use(cors());
+const corsOptions = {
+  origin: 'https://chat-bot-frontend-pi.vercel.app/', // Replace with your frontend URL
+  methods: 'GET,POST',
+  allowedHeaders: 'Content-Type',
+};
+
+app.use(cors(corsOptions));
+
 
 
 const generationConfig = {
