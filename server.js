@@ -1,9 +1,11 @@
 const express = require('express');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const app = express();
-const port = 3000;
 
-const apiKey = 'AIzaSyBDUrUOPuobcZUrWsBNbmuxfxSt_lW3i5E';
+
+const port = process.env.PORT || 3000;
+const apiKey = process.env.API_KEY;
+const frontendUrl = process.env.FRONTEND_URL;
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
@@ -11,7 +13,7 @@ const model = genAI.getGenerativeModel({
 });
 
 const corsOptions = {
-  origin: 'https://chat-bot-frontend-pi.vercel.app/', // Replace with your frontend URL
+  origin: frontendUrl, // Replace with your frontend URL
   methods: 'GET,POST',
   allowedHeaders: 'Content-Type',
 };
