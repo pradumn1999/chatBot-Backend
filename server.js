@@ -1,11 +1,19 @@
+require('dotenv').config(); // Load environment variables
+
 const express = require('express');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const cors = require('cors');
 const app = express();
-
 
 const port = process.env.PORT || 3000;
 const apiKey = process.env.API_KEY;
 const frontendUrl = process.env.FRONTEND_URL;
+
+if (!apiKey) {
+  console.error('API key is missing');
+  process.exit(1); // Exit if API key is not set
+}
+
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
@@ -13,14 +21,13 @@ const model = genAI.getGenerativeModel({
 });
 
 const corsOptions = {
-  origin: frontendUrl, // Replace with your frontend URL
+  origin: frontendUrl || '*', // Fallback for development
   methods: 'GET,POST',
-  allowedHeaders: 'Content-Type',
+  allowedHeaders: ['Content-Type'],
 };
 
 app.use(cors(corsOptions));
-
-
+app.use(express.json());
 
 const generationConfig = {
   temperature: 1,
@@ -30,11 +37,10 @@ const generationConfig = {
   responseMimeType: "text/plain",
 };
 
-app.use(express.json());
-
 app.post('/generate', async (req, res) => {
   const { message } = req.body;
-  console.log('Received message:', message); // Log received message
+  console.log('Received message:', message); 
+
   const chatSession = model.startChat({
     generationConfig,
     history: [],
@@ -42,10 +48,14 @@ app.post('/generate', async (req, res) => {
 
   try {
     const result = await chatSession.sendMessage(message);
-    console.log('API response:', result.response.text()); // Log API response
-    res.json({ response: result.response.text() });
+    console.log('API response:', result); // Log the full response
+    if (result && result.response) {
+      res.json({ response: result.response.text() });
+    } else {
+      res.status(500).json({ error: 'Invalid API response' });
+    }
   } catch (error) {
-    console.error('Error:', error); // Log error
+    console.error('Error:', error); 
     res.status(500).json({ error: error.message });
   }
 });
